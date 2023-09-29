@@ -1,0 +1,2 @@
+ALTER TABLE IF EXISTS booking
+ADD COLUMN IF NOT EXISTS updated_by INTEGER REFERENCES user_account(id);

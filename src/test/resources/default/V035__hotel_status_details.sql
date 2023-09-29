@@ -1,0 +1,1 @@
+ALTER TABLE IF EXISTS hotel ADD COLUMN IF NOT EXISTS status_details text default '';

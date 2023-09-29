@@ -14,8 +14,6 @@ import java.util.stream.Stream;
 public class MdSeedParser {
     private static final String TABLE_ATTRIBUTE_KEY = "@tbl:";
 
-    private final DirectiveProcessor directiveProcessor = new DirectiveProcessor();
-
     public List<SeedTable> parseTables(InputStream inputStream) throws Exception {
         List<String> lines = IOUtils.readLines(inputStream, StandardCharsets.UTF_8);
         Map<String, List<String>> tableName2Lines = groupLinesByTableName(lines);

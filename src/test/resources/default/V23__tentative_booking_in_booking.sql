@@ -1,0 +1,2 @@
+ALTER TABLE IF EXISTS booking
+ADD COLUMN IF NOT EXISTS tentative_booking_id UUID;

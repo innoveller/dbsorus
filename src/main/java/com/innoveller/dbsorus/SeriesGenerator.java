@@ -24,7 +24,7 @@ public class SeriesGenerator {
                     serialValues.add(String.valueOf(i));
                 }
                 return serialValues;
-            } else {
+            } else if(DataTypeUtils.isISODate(fromPart) && DataTypeUtils.isISODate(toPart)) {
                 try {
                     LocalDate fromLocalDate = LocalDate.parse(fromPart);
                     LocalDate toLocalDate = LocalDate.parse(toPart);

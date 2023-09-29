@@ -1,0 +1,2 @@
+ALTER TABLE IF EXISTS user_account
+ALTER COLUMN email TYPE TEXT;
