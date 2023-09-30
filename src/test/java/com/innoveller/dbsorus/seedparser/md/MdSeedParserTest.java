@@ -14,7 +14,7 @@ public class MdSeedParserTest {
     @Test
     public void verifyParseSingleTableCorrectly() throws Exception {
         String content =
-                "### @tbl: bank\n" +
+                "### @table: bank\n" +
                 "| id    | full_name        | short_name |\n" +
                 "|-------|------------------|------------|\n" +
                 "| 10222 | Bank of America  | boa        |\n" +
@@ -34,12 +34,12 @@ public class MdSeedParserTest {
     @Test
     public void verifyParseMultipleTablesCorrectly() throws Exception {
         String content =
-                "### @tbl: bank\n" +
+                "### @table: bank\n" +
                 "| id    | full_name        | short_name |\n" +
                 "|-------|------------------|------------|\n" +
                 "| 10222 | Bank of America  | boa        |\n" +
                 "| 12982 | Chase            | cha        |\n" +
-                "### @tbl: town\n" +
+                "### @table: town\n" +
                 "| id    | name             | population |\n" +
                 "|-------|------------------|------------|\n" +
                 "| 10222 | Yangon           | 25000      |\n" +

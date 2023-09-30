@@ -1,4 +1,4 @@
-### @tb: bank
+### @table: bank
 
 | id | full_name      | short_name |
 |----|----------------|------------|

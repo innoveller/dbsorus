@@ -12,11 +12,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class MdSeedParser {
-    private static final String TABLE_ATTRIBUTE_KEY = "@tbl:";
+    private static final String TABLE_ATTRIBUTE_KEY = "@table:";
 
     public List<SeedTable> parseTables(InputStream inputStream) throws Exception {
         List<String> lines = IOUtils.readLines(inputStream, StandardCharsets.UTF_8);
+        printLines("table", lines);
         Map<String, List<String>> tableName2Lines = groupLinesByTableName(lines);
+        System.out.println("num tables" + tableName2Lines.size());
 
         List<SeedTable> tables = new ArrayList<>();
         for(Map.Entry<String, List<String>> entry: tableName2Lines.entrySet()) {

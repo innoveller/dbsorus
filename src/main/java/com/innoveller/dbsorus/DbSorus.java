@@ -60,6 +60,7 @@ public class DbSorus {
             List<SeedTable> processedSeedTables = new ArrayList<>();
             for(String seedPath : seedPaths) {
                 try(InputStream in = classLoader.getResourceAsStream(seedPath)) {
+                    System.out.println("Parsing tables from seedPath: " + seedPath);
                     List<SeedTable> rawSeedTables = mdTableParser.parseTables(in);
                     for(SeedTable rawSeedTable : rawSeedTables) {
                         SeedTable processSeedTable = directiveProcessor.processDirectives(rawSeedTable);
@@ -67,6 +68,7 @@ public class DbSorus {
                     }
                 }
             }
+            System.out.println("Number of processed tables: " + processedSeedTables.size());
 
             Properties props = new Properties();
             props.setProperty("user", this.username);
