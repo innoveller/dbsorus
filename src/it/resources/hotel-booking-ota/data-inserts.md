@@ -1,0 +1,96 @@
+@table: user_account
+
+| id | email               | display_name     | is_system_user | is_active | get_notified |
+|----|---------------------|------------------|----------------|-----------|--------------|
+| 1  | user@innoveller.com | Innoveller Admin | true           | true      | false        |
+
+@table: town
+
+| id | name_en |
+|----|---------|
+| 1  | Yangon  |
+
+@table: township
+
+| id | name_en   | town_id |
+|----|-----------|---------|
+| 1  | Mayangone | 1       |
+
+
+@table: bed_type
+
+| id | bed_type |
+|----|----------|
+| 1  | Single   |
+| 2  | Twin     |
+
+@table: agent
+
+| id | name         | tax_percentage | creator_id | modifier_id |
+|----|--------------|----------------|------------|-------------|
+| 1  | Shwe Booking | 2.00           | 1          | 1           |
+
+
+@table: hotel
+
+| id | code                  | name         | town_id | is_active | township_id | max_child_age | created_by | property_type | is_tax_excluded | is_partial_payment_allowed | is_archived |
+|----|-----------------------|--------------|---------|-----------|-------------|---------------|------------|---------------|-----------------|----------------------------|-------------|
+| 2  | hotel-sidney-100-8252 | Hotel Sidney | 1       | true      | 1           | 10            | 1          | hotel         | false           | false                      | false       |
+| 3  | novotel-70-1226       | Novotel      | 1       | true      | 1           | 10            | 1          | hotel         | false           | false                      | false       |
+
+
+@table: room_type
+
+| id | hotel_id | name     | description          | max_adults_without_extra_bed | max_guests_without_extra_bed | max_adults_with_extra_bed | max_guests_with_extra_bed | number_of_extra_bed | name_mm | number_of_room | is_active | is_archived | priority |
+|----|----------|----------|----------------------|------------------------------|------------------------------|---------------------------|---------------------------|---------------------|---------|----------------|-----------|-------------|----------|
+| 1  | 2        | Superior | Superior Description | 2                            | 2                            | 3                         | 3                         | 1                   |         | 10             | true      | false       | -1       |
+
+@table: room_bed_count
+
+| room_type_id | bed_type_id | number_of_bed |
+|--------------|-------------|---------------|
+| 1            | 2           | 1             |
+
+@table: rate_group
+
+| id | guest_type | room_type_id | minimum_advance_days | maximum_advance_days | title         | currency | is_active | based_on_plan_id | additional_percentage | dependent_rate_type | additional_flat_amount | template_type |
+|----|------------|--------------|----------------------|----------------------|---------------|----------|-----------|------------------|-----------------------|---------------------|------------------------|---------------|
+| 1  | any        | 1            | NULL                 | NULL                 | Standard Rate | MMK      | true      | NULL             | NULL                  | NULL                | NULL                   | DEFAULT       |
+
+@table: rate_group_date_rate
+
+| rate_group_id | date       | rate    |
+|---------------|------------|---------|
+| 1             | 2023-09-15 | 2000.00 |
+
+@table: room_type_extra_bed_rate
+
+| room_type_id | rate    | rate_group_id |
+|--------------|---------|---------------|
+| 1            | 1300.00 | 1             |
+
+@table: room_type_date_allotment
+
+| room_type_id | date       | allotment |
+|--------------|------------|-----------|
+| 1            | 2023-09-15 | 10        |
+
+
+@table: agent_hotel_commission_version
+
+| id | commission_type | commission_percentage | commission_flat_amount | created_by | commissions_by_room_types | group_id |
+|----|-----------------|-----------------------|------------------------|------------|---------------------------|----------|
+| 1  | PERCENTAGE      | 10                    | NULL                   | 1          | NULL                      | @uuid:g1 |
+| 2  | PERCENTAGE      | 15                    | NULL                   | 1          |                           | @uuid:g1 |
+| 3  | PERCENTAGE      | 7                     | NULL                   | 1          | NULL                      | @uuid:g2 |
+
+@table: agent_hotel
+
+| id | agent_id | hotel_id | commission_version_id | contract_expiration_date |
+|----|----------|----------|-----------------------|--------------------------|
+| 2  | 1        | 2        | 2                     | NULL                     |
+| 3  | 1        | 3        | 3                     | NULL                     |
+
+
+
+

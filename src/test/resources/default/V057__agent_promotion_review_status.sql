@@ -1,8 +1,0 @@
-ALTER TABLE IF EXISTS agent_promotion
-ADD COLUMN IF NOT EXISTS is_reviewed BOOL DEFAULT TRUE;
-
-ALTER TABLE IF EXISTS agent_promotion
-ADD COLUMN IF NOT EXISTS title_my TEXT;
-
-ALTER TABLE IF EXISTS agent_promotion
-ADD COLUMN IF NOT EXISTS description_my TEXT;

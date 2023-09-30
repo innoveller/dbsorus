@@ -1,8 +1,0 @@
-ALTER TABLE IF EXISTS user_account
-DROP COLUMN IF EXISTS password;
-
-ALTER TABLE IF EXISTS user_account
-RENAME COLUMN is_super_admin TO is_system_user;
-
-ALTER TABLE IF EXISTS user_account
-ADD COLUMN IF NOT EXISTS get_notified BOOLEAN DEFAULT FALSE;

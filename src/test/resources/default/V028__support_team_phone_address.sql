@@ -1,4 +1,0 @@
-ALTER TABLE IF EXISTS support_team
-DROP COLUMN IF EXISTS contact_info,
-ADD COLUMN IF NOT EXISTS address TEXT DEFAULT 'Pyay Rd 270, 1B Sanchaung Yangon MM 11111, Pyay Rd, Yangon',
-ADD COLUMN IF NOT EXISTS phone_number TEXT DEFAULT '09 42197 3663';

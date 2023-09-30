@@ -76,16 +76,23 @@ public class DbSorus {
             props.setProperty("ssl", "false");
 
             try(Connection conn = DriverManager.getConnection(this.databaseUrl, props)) {
+                List<String> listOfSqlToExecute = new ArrayList<>();
+
                 for(SeedTable givenTable: processedSeedTables) {
-                    System.out.println("Working on tale: " + givenTable.getName());
+                    System.out.println("Working on table: " + givenTable.getName());
                     PgTableMetadata tableMetadata = PgTableInspector.inspectTable(conn, givenTable.getName());
                     for(SeedTableRow row : givenTable.getRows()) {
                         String sql = PgTableSQLComposer.composeInsertStatement(
                                 tableMetadata, row.getMap());
-                        System.out.println("\nExecuting sql:\n" + sql);
-                        //Statement stmt = conn.createStatement();
-                        //stmt.executeUpdate(errorOrSql.get());
+                        listOfSqlToExecute.add(sql);
                     }
+                }
+                System.out.println("Executing " + listOfSqlToExecute.size() + " insert statements ...");
+
+                for(String sql : listOfSqlToExecute) {
+                    System.out.println("\nExecuting Insert:\n" + sql);
+                    Statement stmt = conn.createStatement();
+                    stmt.executeUpdate(sql);
                 }
             }
         }

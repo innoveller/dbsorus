@@ -1,2 +1,0 @@
-ALTER TABLE IF EXISTS booking_attempt
-ADD COLUMN IF NOT EXISTS agent_id INT REFERENCES agent(id);

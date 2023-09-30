@@ -1,3 +1,0 @@
-ALTER TABLE IF EXISTS hotel_content
-ADD COLUMN IF NOT EXISTS check_in_details TEXT DEFAULT '',
-ADD COLUMN IF NOT EXISTS check_out_details TEXT DEFAULT '';

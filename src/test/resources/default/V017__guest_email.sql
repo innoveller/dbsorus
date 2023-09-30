@@ -1,1 +1,0 @@
-ALTER TABLE guest add column email text;

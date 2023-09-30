@@ -25,9 +25,7 @@ public class PgTableSQLComposer {
             if(javaDataTypeOptional.isPresent()) {
                 Object columnValue = givenRowData.containsKey(columnMetadata.getName())?
                         givenRowData.get(columnMetadata.getName()) : javaDataTypeOptional.get().getDefaultValue();
-                String insertingReadyValue = (columnValue instanceof Number)?
-                        columnValue.toString() : "'" + columnValue.toString() + "'";
-                finalInsertingKeyValueMap.put(columnMetadata.getName(), insertingReadyValue);
+                finalInsertingKeyValueMap.put(columnMetadata.getName(), toSqlInsertValue(columnValue));
             } else {
                 throw new Exception("Given data type (" + columnMetadata.getDataTypeCode() + ") for " +
                         columnMetadata.getName() + " in table (" + metadata.getTableName() + ") is not supported");
@@ -38,5 +36,14 @@ public class PgTableSQLComposer {
         String columnValueCsv = String.join(", ", finalInsertingKeyValueMap.values());
 
         return "INSERT INTO " + metadata.getTableName() + " (" + columnNameCsv + ") \nVALUES (" + columnValueCsv + ");";
+    }
+
+    private static String toSqlInsertValue(Object columnValue) {
+        if(columnValue != null) {
+            return (columnValue instanceof Number)?
+                    columnValue.toString() : "'" + columnValue.toString() + "'";
+        } else {
+            return null;
+        }
     }
 }

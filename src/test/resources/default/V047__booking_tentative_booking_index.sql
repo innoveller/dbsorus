@@ -1,5 +1,0 @@
-CREATE INDEX IF NOT EXISTS tentative_booking_room_rate_tentative_booking_room_id ON tentative_booking_room_rate(tentative_booking_room_id);
-CREATE INDEX IF NOT EXISTS tentative_booking_room_tentative_booking_id ON tentative_booking_room(tentative_booking_id);
-
-CREATE INDEX IF NOT EXISTS booking_room_rate_booking_room_id ON booking_room_rate(booking_room_id);
-CREATE INDEX IF NOT EXISTS booking_room_booking_id ON booking_room(booking_id);

@@ -56,7 +56,7 @@ public class MdSeedParser {
             for(int colIndex = 0; colIndex< columnNames.size(); colIndex++) {
                 String columnName = columnNames.get(colIndex);
                 String columnValue = columnValues.get(colIndex);
-                map.put(columnName, columnValue);
+                map.put(columnName, isNullString(columnValue)? null : columnValue);
             }
             tableRows.add(new SeedTableRow(map));
         }
@@ -71,6 +71,12 @@ public class MdSeedParser {
     private List<String> parseColumnValues(String mdTableRowString) {
         String[] tokens = mdTableRowString.replaceFirst("\\|", "").split("\\|");
         return Stream.of(tokens).map(String::trim).collect(Collectors.toList());
+    }
+
+    private boolean isNullString(String value) {
+        if(value == null) {
+            return true;
+        } else return "null".equalsIgnoreCase(value.trim());
     }
 
     private void printLines(String description, List<String> lines) {

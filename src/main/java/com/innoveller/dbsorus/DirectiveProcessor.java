@@ -1,8 +1,11 @@
 package com.innoveller.dbsorus;
 
+import com.innoveller.dbsorus.expressions.SeriesExpressionParser;
 import com.innoveller.dbsorus.models.SeedTable;
 import com.innoveller.dbsorus.models.SeedTableRow;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class DirectiveProcessor {
@@ -29,17 +32,25 @@ public class DirectiveProcessor {
 
     public List<SeedTableRow> processDirectives(SeedTableRow row) throws Exception {
         // process @uuid
-        Map<String, String> uuidGeneratedColumnValueMap = new HashMap<>();
+        Map<String, String> updatingColumnValues = new HashMap<>();
         row.getMap().forEach((key, value) -> {
-            if(value != null && value.trim().startsWith("@uuid:")) {
-                uuidGeneratedColumnValueMap.put(key, getOrGenerateUUID(value.trim()).toString());
+            if(value != null) {
+                if(value.trim().startsWith("@uuid:")) {
+                    updatingColumnValues.put(key, getOrGenerateUUID(value.trim()).toString());
+                } else if(value.trim().startsWith("@date:")) {
+                    String dateExpression = value.trim().substring("@date:".length()).trim();
+                    if("today".equalsIgnoreCase(dateExpression)) {
+                        String dateValue = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
+                        updatingColumnValues.put(key, dateValue);
+                    }
+                }
             }
         });
-        row = row.withNewValues(uuidGeneratedColumnValueMap);
+        row = row.withNewValues(updatingColumnValues);
 
         // process @series
         Optional<Map.Entry<String, String>> entryOptional = row.getMap().entrySet().stream()
-                .filter(entry -> entry.getValue().contains("@series:")).findAny();
+                .filter(entry -> entry.getValue()!=null && entry.getValue().contains("@series:")).findAny();
         if(entryOptional.isPresent()) {
             String columnName = entryOptional.get().getKey();
             String value = entryOptional.get().getValue().trim();
@@ -47,7 +58,7 @@ public class DirectiveProcessor {
             String rangePart = value.substring(value.indexOf("@series:") + "@series:".length());
             System.out.println("Range part: " + rangePart);
 
-            List<String> serialValues = SeriesGenerator.generateSeries(rangePart);
+            List<String> serialValues = SeriesExpressionParser.generateSeries(rangePart);
             List<SeedTableRow> serialRows = new ArrayList<>();
             for(String serialValue: serialValues) {
                 serialRows.add(row.withNewValue(columnName, serialValue));
