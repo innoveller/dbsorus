@@ -22,7 +22,7 @@ public class DirectiveProcessorTest {
         SeedTableRow seedTableRow1 = new SeedTableRow(FluentHashMap.map("id", "1").with("name", "James"));
         SeedTableRow seedTableRow2 = new SeedTableRow(FluentHashMap.map("id", "2").with("name", null));
 
-        SeedTable seedTable = new SeedTable("users", List.of("id"),
+        SeedTable seedTable = new SeedTable("users", Collections.singletonList("id"),
                 Stream.of(seedTableRow1, seedTableRow2).collect(Collectors.toList()));
 
         SeedTable resultSeedTable = directiveProcessor.processDirectives(seedTable);
@@ -41,7 +41,7 @@ public class DirectiveProcessorTest {
         DirectiveProcessor directiveProcessor = new DirectiveProcessor();
 
         SeedTableRow seedTableRow = new SeedTableRow(Collections.singletonMap("id", "@uuid:x"));
-        SeedTable seedTable = new SeedTable("users", List.of("id"), Collections.singletonList(seedTableRow));
+        SeedTable seedTable = new SeedTable("users", Collections.singletonList("id"), Collections.singletonList(seedTableRow));
 
         SeedTable resultSeedTable = directiveProcessor.processDirectives(seedTable);
         List<SeedTableRow> resultRows = resultSeedTable.getRows();
@@ -60,7 +60,8 @@ public class DirectiveProcessorTest {
         rowMap.put("total_count", "@series:10..14");
 
         SeedTableRow seedTableRow = new SeedTableRow(rowMap);
-        SeedTable seedTable = new SeedTable("purchases", List.of("id", "total_count"), Collections.singletonList(seedTableRow));
+        SeedTable seedTable = new SeedTable("purchases", Stream.of("id", "total_count").collect(Collectors.toList()),
+                Collections.singletonList(seedTableRow));
 
         SeedTable resultSeedTable = directiveProcessor.processDirectives(seedTable);
         List<SeedTableRow> resultRows = resultSeedTable.getRows();
@@ -82,7 +83,7 @@ public class DirectiveProcessorTest {
         rowMap.put("date", "@series:2023-01-01..2023-01-03");
 
         SeedTableRow seedTableRow = new SeedTableRow(rowMap);
-        SeedTable seedTable = new SeedTable("rates", List.of("id", "date"), Collections.singletonList(seedTableRow));
+        SeedTable seedTable = new SeedTable("rates", Stream.of("id", "date").collect(Collectors.toList()), Collections.singletonList(seedTableRow));
 
         SeedTable resultSeedTable = directiveProcessor.processDirectives(seedTable);
         List<SeedTableRow> resultRows = resultSeedTable.getRows();
@@ -102,7 +103,7 @@ public class DirectiveProcessorTest {
                 .with("date", "@date:today")
                 .with("allotment", "3"));
         SeedTable seedTable = new SeedTable("room_allotment",
-                List.of("room_id", "date", "allotment"), //TODO weak link
+                Stream.of("room_id", "date", "allotment").collect(Collectors.toList()), //TODO weak link
                 Collections.singletonList(seedTableRow));
 
         SeedTable resultSeedTable = directiveProcessor.processDirectives(seedTable);

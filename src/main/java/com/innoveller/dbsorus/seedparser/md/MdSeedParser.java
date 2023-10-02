@@ -38,7 +38,7 @@ public class MdSeedParser {
                 currentTableName = currLine.substring(subStringStart).trim();
                 tableName2Lines.put(currentTableName, new ArrayList<>());
             } else {
-                if(currentTableName!=null && !currLine.isBlank() && !currLine.contains("-|")) {
+                if(currentTableName!=null && !currLine.isEmpty() && !currLine.contains("-|")) {
                     tableName2Lines.get(currentTableName).add(currLine);
                 }
             }
@@ -65,7 +65,7 @@ public class MdSeedParser {
 
     private List<String> parseColumnNames(String mdTableRowString) {
         String[] tokens = mdTableRowString.replaceFirst("\\|", "").split("\\|");
-        return Stream.of(tokens).map(String::trim).filter(value -> !value.isBlank()).collect(Collectors.toList());
+        return Stream.of(tokens).map(String::trim).filter(value -> !value.isEmpty()).collect(Collectors.toList());
     }
 
     private List<String> parseColumnValues(String mdTableRowString) {
