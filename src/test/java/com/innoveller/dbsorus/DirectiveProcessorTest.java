@@ -6,6 +6,7 @@ import com.innoveller.dbsorus.testhelpers.FluentHashMap;
 import org.junit.Test;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -138,5 +139,35 @@ public class DirectiveProcessorTest {
 
         String isoDateString = resultRows.get(0).getValue("date");
         assertEquals(LocalDate.now().format(DateTimeFormatter.ISO_DATE), isoDateString);
+    }
+
+    @Test
+    public void shouldGenerateDateTime() throws Exception {
+        DirectiveProcessor directiveProcessor = new DirectiveProcessor();
+
+        SeedTableRow seedTableRow = new SeedTableRow(FluentHashMap
+                .map("room_id", "@uuid:r1")
+                .with("today", "@date:today")
+                .with("tomorrow", "@date:today+P1D")
+                .with("meeting_time", "@datetime:now")
+                .with("allotment", "3"));
+        SeedTable seedTable = new SeedTable("room_allotment",
+                Collections.emptyList(), //TODO weak link
+                Collections.singletonList(seedTableRow));
+
+        SeedTable resultSeedTable = directiveProcessor.processDirectives(seedTable);
+        List<SeedTableRow> resultRows = resultSeedTable.getRows();
+        assertEquals(1, resultRows.size());
+
+        String uuidString = resultRows.get(0).getValue("room_id");
+        UUID uuid = directiveProcessor.getOrGenerateUUID("@uuid:r1");
+        assertEquals(uuid.toString(), uuidString);
+
+        assertEquals(LocalDate.now().format(DateTimeFormatter.ISO_DATE), resultRows.get(0).getValue("today"));
+
+        //assertEquals(LocalDate.now().plusDays(1).format(DateTimeFormatter.ISO_DATE), resultRows.get(0).getValue("tomorrow"));
+        //assertEquals(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME), resultRows.get(0).getValue("meeting_time"));
+        //String isoDateString = resultRows.get(0).getValue("date");
+        //assertEquals(LocalDate.now().format(DateTimeFormatter.ISO_DATE), isoDateString);
     }
 }

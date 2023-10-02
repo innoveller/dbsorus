@@ -1,10 +1,13 @@
 package com.innoveller.dbsorus;
 
+import com.innoveller.dbsorus.expressions.DateTimeExpressionParser;
 import com.innoveller.dbsorus.expressions.SeriesExpressionParser;
 import com.innoveller.dbsorus.models.SeedTable;
 import com.innoveller.dbsorus.models.SeedTableRow;
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -56,10 +59,16 @@ public class DirectiveProcessor {
                     updatingColumnValues.put(key, getOrGenerateInteger(integerKey).toString());
                 } else if(value.trim().startsWith("@date:")) {
                     String dateExpression = value.trim().substring("@date:".length()).trim();
-                    if("today".equalsIgnoreCase(dateExpression)) {
-                        String dateValue = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
-                        updatingColumnValues.put(key, dateValue);
-                    }
+                    LocalDate localDate = DateTimeExpressionParser.parseDate(dateExpression);
+                    updatingColumnValues.put(key, localDate.format(DateTimeFormatter.ISO_DATE));
+                } else if(value.trim().startsWith("@datetime:")) {
+                    String dateTimeExpression = value.trim().substring("@datetime:".length()).trim();
+                    LocalDateTime localDateTime = DateTimeExpressionParser.parseDateTime(dateTimeExpression);
+                    updatingColumnValues.put(key, localDateTime.format(DateTimeFormatter.ISO_DATE_TIME));
+                } else if(value.trim().startsWith("@instant:")) {
+                    String instantExpression = value.trim().substring("@instant:".length()).trim();
+                    Instant instant = DateTimeExpressionParser.parseInstant(instantExpression);
+                    updatingColumnValues.put(key, instant.toString());
                 }
             }
         });
