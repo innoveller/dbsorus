@@ -93,8 +93,20 @@ Add the dependency
 libraryDependencies += "com.github.innoveller" % "dbsorus" % "0.1.2"
 ```
 
+## Directives
 
-## UUID Directive
+### Integer Directive
+```
+@integer:admin-user-id
+@integer:agent-user-id
+```
+
+### UUID Directive
+
+```
+@uuid:order-1
+@uuid:product-x
+```
 
 ### Example:
 ```markdown
@@ -127,8 +139,10 @@ The following will be inserted into actual database.
 |------|---------------------------------------|
 | 1973 | 8a3857ba-5f81-11ee-8c99-0242ac120002  |
 
-## Date Time Directive
+### Date Time Directive
 Supports ISO-8601 Duration Format
+
+https://www.digi.com/resources/documentation/digidocs//90001488-13/reference/r_iso_8601_duration_format.htm
 
 Local Date
 ```
@@ -152,7 +166,7 @@ Instant
 @instant:now+PT10M
 ```
 
-## Series Directive
+### Series Directive
 
 Series directives support for both integers and dates.
 ```

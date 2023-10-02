@@ -8,16 +8,27 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.innoveller.dbsorus.models.SeedTableRow;
 import com.innoveller.dbsorus.seedparser.md.MdSeedParser;
 
 public class DbSorus {
+
+    private final DirectiveProcessor directiveProcessor;
+
+    private DbSorus(DirectiveProcessor directiveProcessor) {
+        this.directiveProcessor = directiveProcessor;
+    }
+
+    public UUID getOrGenerateUUID(String key) {
+        return this.directiveProcessor.getOrGenerateUUID("@uuid:" + key);
+    }
+
+    public Integer getorGenerateInteger(String key) {
+        return this.directiveProcessor.getOrGenerateInteger("@integer:" + key);
+    }
 
     public static Configurator configure(ClassLoader classLoader) {
         return new Configurator(classLoader);
@@ -53,7 +64,7 @@ public class DbSorus {
             return this;
         }
 
-        public void load() throws Exception {
+        public DbSorus load() throws Exception {
             MdSeedParser mdTableParser = new MdSeedParser();
             DirectiveProcessor directiveProcessor = new DirectiveProcessor();
 
@@ -95,6 +106,8 @@ public class DbSorus {
                     stmt.executeUpdate(sql);
                 }
             }
+
+            return new DbSorus(directiveProcessor);
         }
     }
 }

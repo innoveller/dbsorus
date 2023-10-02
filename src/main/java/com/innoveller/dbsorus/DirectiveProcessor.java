@@ -10,14 +10,25 @@ import java.util.*;
 
 public class DirectiveProcessor {
     private final Map<String, UUID> uuidMap = new HashMap<>();
+    private final Map<String, Integer> integerMap = new HashMap<>();
 
-    private UUID getOrGenerateUUID(String key) {
+    public UUID getOrGenerateUUID(String key) {
         if(uuidMap.containsKey(key)) {
             return uuidMap.get(key);
         } else {
             UUID uuid = UUID.randomUUID();
             uuidMap.put(key, uuid);
             return uuid;
+        }
+    }
+
+    public Integer getOrGenerateInteger(String key) {
+        if(integerMap.containsKey(key)) {
+            return integerMap.get(key);
+        } else {
+            Integer intValue = Double.valueOf(Math.random() * Integer.MAX_VALUE).intValue();
+            integerMap.put(key, intValue);
+            return intValue;
         }
     }
 
@@ -36,6 +47,8 @@ public class DirectiveProcessor {
         row.getMap().forEach((key, value) -> {
             if(value != null) {
                 if(value.trim().startsWith("@uuid:")) {
+                    updatingColumnValues.put(key, getOrGenerateUUID(value.trim()).toString());
+                } else if(value.trim().startsWith("@integer:")) {
                     updatingColumnValues.put(key, getOrGenerateUUID(value.trim()).toString());
                 } else if(value.trim().startsWith("@date:")) {
                     String dateExpression = value.trim().substring("@date:".length()).trim();

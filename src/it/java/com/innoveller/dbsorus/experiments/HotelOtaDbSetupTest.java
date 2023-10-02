@@ -6,6 +6,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.testcontainers.containers.PostgreSQLContainer;
 import java.io.IOException;
+import java.util.UUID;
+
+import static org.junit.Assert.assertNotNull;
 
 public class HotelOtaDbSetupTest {
     private static final String DATABASE_NAME = "test_db";
@@ -19,6 +22,8 @@ public class HotelOtaDbSetupTest {
             .withInitScript("hotel-booking-ota/schema.sql")
             .withExposedPorts(5432);
 
+    public static DbSorus dbSorus;
+
     @BeforeClass
     public static void before() throws Exception {
         System.out.println("Container is starting...");
@@ -27,7 +32,7 @@ public class HotelOtaDbSetupTest {
         //System.out.println("Using mapped port: " + port);
         //System.out.println("Container JDBC url: " + container.getJdbcUrl());
 
-        DbSorus.configure(Thread.currentThread().getContextClassLoader())
+        dbSorus = DbSorus.configure(Thread.currentThread().getContextClassLoader())
                 .dataSource(container.getJdbcUrl(), container.getUsername(), container.getPassword())
                 .seedPath("hotel-booking-ota/data-inserts.md")
                 .load();
@@ -46,6 +51,9 @@ public class HotelOtaDbSetupTest {
 
         Assert.assertEquals(85, resourceFileNames.size());
         System.out.println("resourceFileNamese : " + resourceFileNames);*/
+
+        UUID uuid = dbSorus.getOrGenerateUUID("x");
+        assertNotNull(uuid);
     }
 
     @AfterClass
