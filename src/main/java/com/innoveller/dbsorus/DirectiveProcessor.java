@@ -49,7 +49,7 @@ public class DirectiveProcessor {
                 if(value.trim().startsWith("@uuid:")) {
                     updatingColumnValues.put(key, getOrGenerateUUID(value.trim()).toString());
                 } else if(value.trim().startsWith("@integer:")) {
-                    updatingColumnValues.put(key, getOrGenerateUUID(value.trim()).toString());
+                    updatingColumnValues.put(key, getOrGenerateInteger(value.trim()).toString());
                 } else if(value.trim().startsWith("@date:")) {
                     String dateExpression = value.trim().substring("@date:".length()).trim();
                     if("today".equalsIgnoreCase(dateExpression)) {
