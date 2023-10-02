@@ -27,7 +27,7 @@ public class DbSorus {
     }
 
     public Integer getorGenerateInteger(String key) {
-        return this.directiveProcessor.getOrGenerateInteger("@integer:" + key);
+        return this.directiveProcessor.getOrGenerateInteger(key);
     }
 
     public static Configurator configure(ClassLoader classLoader) {

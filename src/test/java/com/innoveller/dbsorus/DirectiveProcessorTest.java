@@ -52,6 +52,29 @@ public class DirectiveProcessorTest {
     }
 
     @Test
+    public void shouldGenerateInteger() throws Exception {
+        DirectiveProcessor directiveProcessor = new DirectiveProcessor();
+
+        SeedTableRow seedTableRow1 = new SeedTableRow(Collections.singletonMap("id", "@int:x"));
+        SeedTableRow seedTableRow2 = new SeedTableRow(Collections.singletonMap("id", "@integer:y"));
+
+        SeedTable seedTable = new SeedTable("users", Collections.singletonList("id"),
+                Stream.of(seedTableRow1, seedTableRow2).collect(Collectors.toList()));
+
+        SeedTable resultSeedTable = directiveProcessor.processDirectives(seedTable);
+        List<SeedTableRow> resultRows = resultSeedTable.getRows();
+        assertEquals(2, resultRows.size());
+
+        String intString1 = resultRows.get(0).getValue("id");
+        Integer retrievedInt1 = directiveProcessor.getOrGenerateInteger("x");
+        assertEquals(String.valueOf(retrievedInt1), intString1);
+
+        String intString2 = resultRows.get(1).getValue("id");
+        Integer retrievedInt2 = directiveProcessor.getOrGenerateInteger("y");
+        assertEquals(String.valueOf(retrievedInt2), intString2);
+    }
+
+    @Test
     public void shouldGenerateNumberSeries() throws Exception {
         DirectiveProcessor directiveProcessor = new DirectiveProcessor();
 
