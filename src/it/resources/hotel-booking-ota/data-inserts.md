@@ -4,11 +4,28 @@
 |----|---------------------|------------------|----------------|-----------|--------------|
 | 1  | user@innoveller.com | Innoveller Admin | true           | true      | false        |
 
+
+@json:selection-1
+```json
+[
+   {
+      "id":"@int:rt-1",
+      "rates":[],
+      "roomTypeId":200,
+      "rateGroupId":100,
+      "numberOfAdults":2,
+      "numberOfChildren":0,
+      "numberOfExtraBeds":0
+   }
+]
+```
+
+
 @table: town
 
-| id | name_en |
-|----|---------|
-| 1  | Yangon  |
+| id | name_en | description_en    |
+|----|---------|-------------------|
+| 1  | Yangon  | @json:selection-1 |
 
 @table: township
 

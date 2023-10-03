@@ -1,18 +1,20 @@
 package com.innoveller.dbsorus;
 
-import com.innoveller.dbsorus.models.SeedTable;
-import com.innoveller.dbsorus.models.PgTableMetadata;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.innoveller.dbsorus.directives.DirectiveProcessor;
+import com.innoveller.dbsorus.models.*;
 
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.innoveller.dbsorus.models.SeedTableRow;
-import com.innoveller.dbsorus.seedparser.md.MdSeedParser;
+import com.innoveller.dbsorus.seedparser.md.MdJsonParser;
+import com.innoveller.dbsorus.seedparser.md.MdTableParser;
+import com.innoveller.dbsorus.utils.IOUtils;
 
 public class DbSorus {
 
@@ -22,12 +24,14 @@ public class DbSorus {
         this.directiveProcessor = directiveProcessor;
     }
 
-    public UUID getOrGenerateUUID(String key) {
-        return this.directiveProcessor.getOrGenerateUUID("@uuid:" + key);
+    public UUID retrieveGeneratedUUID(String key) {
+        return this.directiveProcessor.getColumnLevelDirectiveProcessor().retrieveGeneratedUUID(key)
+                .orElseThrow(() -> new RuntimeException("Cannot retrieve the generated UUID by key: " + key));
     }
 
     public Integer getorGenerateInteger(String key) {
-        return this.directiveProcessor.getOrGenerateInteger(key);
+        return this.directiveProcessor.getColumnLevelDirectiveProcessor().retrieveGeneratedInteger(key)
+                .orElseThrow(() -> new RuntimeException("Cannot retrieve the generated Integer by key: " + key));
     }
 
     public static Configurator configure(ClassLoader classLoader) {
@@ -65,17 +69,42 @@ public class DbSorus {
         }
 
         public DbSorus load() throws Exception {
-            MdSeedParser mdTableParser = new MdSeedParser();
+            MdTableParser mdTableParser = new MdTableParser();
+            MdJsonParser mdJsonParser = new MdJsonParser();
+
             DirectiveProcessor directiveProcessor = new DirectiveProcessor();
 
             List<SeedTable> processedSeedTables = new ArrayList<>();
             for(String seedPath : seedPaths) {
                 try(InputStream in = classLoader.getResourceAsStream(seedPath)) {
+                    List<String> lines = IOUtils.readLines(in, StandardCharsets.UTF_8);
+
                     System.out.println("Parsing tables from seedPath: " + seedPath);
-                    List<SeedTable> rawSeedTables = mdTableParser.parseTables(in);
-                    for(SeedTable rawSeedTable : rawSeedTables) {
-                        SeedTable processSeedTable = directiveProcessor.processDirectives(rawSeedTable);
-                        processedSeedTables.add(processSeedTable);
+                    List<SeedTable> rawSeedTables = mdTableParser.parseTables(lines);
+
+                    System.out.println("Parsing json documents from seedPath: " + seedPath);
+                    List<SeedJsonDocument> rawSeedJsonDocuments = mdJsonParser.parseJsonObjects(lines);
+                    System.out.println("Found json documents: " + rawSeedJsonDocuments.size());
+
+                    List<SeedObject> rawSeedObjects = new ArrayList<>();
+                    rawSeedObjects.addAll(rawSeedTables);
+                    rawSeedObjects.addAll(rawSeedJsonDocuments);
+                    List<SeedObject> orderedRawSeedObjects = rawSeedObjects.stream()
+                            .sorted(Comparator.comparing(SeedObject::getPrecedence)).collect(Collectors.toList());
+
+                    for(SeedObject rawSeedObject : orderedRawSeedObjects) {
+                        System.out.println("Processing seed object: " + rawSeedObject.getName());
+
+                        if(rawSeedObject instanceof SeedTable) {
+
+                            SeedTable rawSeedTable = (SeedTable) rawSeedObject;
+                            SeedTable processSeedTable = directiveProcessor.processDirectives(rawSeedTable);
+                            processedSeedTables.add(processSeedTable);
+                        } else if(rawSeedObject instanceof SeedJsonDocument) {
+                            SeedJsonDocument rawSeedJsonDoc = (SeedJsonDocument) rawSeedObject;
+                            JsonNode jsonNode = directiveProcessor.processDirectives(rawSeedJsonDoc);
+                            directiveProcessor.getColumnLevelDirectiveProcessor().addJsonNode(rawSeedJsonDoc.getName(), jsonNode);
+                        }
                     }
                 }
             }

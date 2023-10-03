@@ -1,12 +1,16 @@
 package com.innoveller.dbsorus;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.innoveller.dbsorus.directives.DirectiveProcessor;
+import com.innoveller.dbsorus.models.SeedJsonDocument;
 import com.innoveller.dbsorus.models.SeedTable;
 import com.innoveller.dbsorus.models.SeedTableRow;
 import com.innoveller.dbsorus.testhelpers.FluentHashMap;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,7 +27,7 @@ public class DirectiveProcessorTest {
         SeedTableRow seedTableRow1 = new SeedTableRow(FluentHashMap.map("id", "1").with("name", "James"));
         SeedTableRow seedTableRow2 = new SeedTableRow(FluentHashMap.map("id", "2").with("name", null));
 
-        SeedTable seedTable = new SeedTable("users", Collections.singletonList("id"),
+        SeedTable seedTable = new SeedTable("users", 0, Collections.singletonList("id"),
                 Stream.of(seedTableRow1, seedTableRow2).collect(Collectors.toList()));
 
         SeedTable resultSeedTable = directiveProcessor.processDirectives(seedTable);
@@ -42,7 +46,7 @@ public class DirectiveProcessorTest {
         DirectiveProcessor directiveProcessor = new DirectiveProcessor();
 
         SeedTableRow seedTableRow = new SeedTableRow(Collections.singletonMap("id", "@uuid:x"));
-        SeedTable seedTable = new SeedTable("users", Collections.singletonList("id"), Collections.singletonList(seedTableRow));
+        SeedTable seedTable = new SeedTable("users", 0, Collections.singletonList("id"), Collections.singletonList(seedTableRow));
 
         SeedTable resultSeedTable = directiveProcessor.processDirectives(seedTable);
         List<SeedTableRow> resultRows = resultSeedTable.getRows();
@@ -59,7 +63,7 @@ public class DirectiveProcessorTest {
         SeedTableRow seedTableRow1 = new SeedTableRow(Collections.singletonMap("id", "@int:x"));
         SeedTableRow seedTableRow2 = new SeedTableRow(Collections.singletonMap("id", "@integer:y"));
 
-        SeedTable seedTable = new SeedTable("users", Collections.singletonList("id"),
+        SeedTable seedTable = new SeedTable("users", 0, Collections.singletonList("id"),
                 Stream.of(seedTableRow1, seedTableRow2).collect(Collectors.toList()));
 
         SeedTable resultSeedTable = directiveProcessor.processDirectives(seedTable);
@@ -67,11 +71,11 @@ public class DirectiveProcessorTest {
         assertEquals(2, resultRows.size());
 
         String intString1 = resultRows.get(0).getValue("id");
-        Integer retrievedInt1 = directiveProcessor.getOrGenerateInteger("x");
+        Integer retrievedInt1 = directiveProcessor.retrieveGeneratedInteger("x").get();
         assertEquals(String.valueOf(retrievedInt1), intString1);
 
         String intString2 = resultRows.get(1).getValue("id");
-        Integer retrievedInt2 = directiveProcessor.getOrGenerateInteger("y");
+        Integer retrievedInt2 = directiveProcessor.retrieveGeneratedInteger("y").get();
         assertEquals(String.valueOf(retrievedInt2), intString2);
     }
 
@@ -84,7 +88,7 @@ public class DirectiveProcessorTest {
         rowMap.put("total_count", "@series:10..14");
 
         SeedTableRow seedTableRow = new SeedTableRow(rowMap);
-        SeedTable seedTable = new SeedTable("purchases", Stream.of("id", "total_count").collect(Collectors.toList()),
+        SeedTable seedTable = new SeedTable("purchases", 0, Stream.of("id", "total_count").collect(Collectors.toList()),
                 Collections.singletonList(seedTableRow));
 
         SeedTable resultSeedTable = directiveProcessor.processDirectives(seedTable);
@@ -107,7 +111,7 @@ public class DirectiveProcessorTest {
         rowMap.put("date", "@series:2023-01-01..2023-01-03");
 
         SeedTableRow seedTableRow = new SeedTableRow(rowMap);
-        SeedTable seedTable = new SeedTable("rates", Stream.of("id", "date").collect(Collectors.toList()), Collections.singletonList(seedTableRow));
+        SeedTable seedTable = new SeedTable("rates", 0, Stream.of("id", "date").collect(Collectors.toList()), Collections.singletonList(seedTableRow));
 
         SeedTable resultSeedTable = directiveProcessor.processDirectives(seedTable);
         List<SeedTableRow> resultRows = resultSeedTable.getRows();
@@ -127,7 +131,7 @@ public class DirectiveProcessorTest {
                 .with("date", "@date:today")
                 .with("allotment", "3"));
         SeedTable seedTable = new SeedTable("room_allotment",
-                Stream.of("room_id", "date", "allotment").collect(Collectors.toList()), //TODO weak link
+                0, Stream.of("room_id", "date", "allotment").collect(Collectors.toList()), //TODO weak link
                 Collections.singletonList(seedTableRow));
 
         SeedTable resultSeedTable = directiveProcessor.processDirectives(seedTable);
@@ -152,7 +156,7 @@ public class DirectiveProcessorTest {
                 .with("meeting_time", "@datetime:now")
                 .with("allotment", "3"));
         SeedTable seedTable = new SeedTable("room_allotment",
-                Collections.emptyList(), //TODO weak link
+                0, Collections.emptyList(), //TODO weak link
                 Collections.singletonList(seedTableRow));
 
         SeedTable resultSeedTable = directiveProcessor.processDirectives(seedTable);
@@ -160,7 +164,7 @@ public class DirectiveProcessorTest {
         assertEquals(1, resultRows.size());
 
         String uuidString = resultRows.get(0).getValue("room_id");
-        UUID uuid = directiveProcessor.getOrGenerateUUID("@uuid:r1");
+        UUID uuid = directiveProcessor.retrieveGeneratedUUID("r1").get();
         assertEquals(uuid.toString(), uuidString);
 
         assertEquals(LocalDate.now().format(DateTimeFormatter.ISO_DATE), resultRows.get(0).getValue("today"));
@@ -170,4 +174,33 @@ public class DirectiveProcessorTest {
         //String isoDateString = resultRows.get(0).getValue("date");
         //assertEquals(LocalDate.now().format(DateTimeFormatter.ISO_DATE), isoDateString);
     }
+
+    @Test
+    public void shouldProcessDirectivesOnJson() throws IOException {
+        String content = "[\n" +
+                "   {\n" +
+                "      \"id\":\"@int:rt-1\",\n" +
+                "      \"date\":\"@date:today\",\n" +
+                "      \"rates\":[],\n" +
+                "      \"date\":200,\n" +
+                "      \"rateGroupId\":100,\n" +
+                "      \"numberOfAdults\":2,\n" +
+                "      \"numberOfChildren\":0,\n" +
+                "      \"numberOfExtraBeds\":0\n" +
+                "   }\n" +
+                "]";
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(content);
+        SeedJsonDocument seedJsonDocument = new SeedJsonDocument("selection", 0, jsonNode);
+
+        DirectiveProcessor directiveProcessor = new DirectiveProcessor();
+        Integer generatedInt = directiveProcessor.getColumnLevelDirectiveProcessor().getOrGenerateInteger("rt-1");
+        JsonNode processNode = directiveProcessor.processDirectives(seedJsonDocument);
+        System.out.println("processed json:\n" + processNode.toString());
+        assertEquals(String.valueOf(generatedInt), processNode.get(0).get("id").asText());
+
+
+    }
+
+
 }

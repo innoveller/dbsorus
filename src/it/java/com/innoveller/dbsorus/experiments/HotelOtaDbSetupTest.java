@@ -34,7 +34,7 @@ public class HotelOtaDbSetupTest {
 
         dbSorus = DbSorus.configure(Thread.currentThread().getContextClassLoader())
                 .dataSource(container.getJdbcUrl(), container.getUsername(), container.getPassword())
-                .seedPath("hotel-booking-ota/data-inserts.md")
+                .seedPath("hotel-booking-ota/example.md")
                 .load();
     }
 
@@ -52,8 +52,11 @@ public class HotelOtaDbSetupTest {
         Assert.assertEquals(85, resourceFileNames.size());
         System.out.println("resourceFileNamese : " + resourceFileNames);*/
 
-        UUID uuid = dbSorus.getOrGenerateUUID("x");
-        assertNotNull(uuid);
+        //UUID uuid = dbSorus.getOrGenerateUUID("x");
+        //assertNotNull(uuid);
+
+        Integer id = dbSorus.getorGenerateInteger("novotel-std");
+        System.out.println("Room type id : " + id);
     }
 
     @AfterClass
