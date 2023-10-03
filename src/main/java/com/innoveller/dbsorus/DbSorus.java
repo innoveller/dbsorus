@@ -96,7 +96,6 @@ public class DbSorus {
                         System.out.println("Processing seed object: " + rawSeedObject.getName());
 
                         if(rawSeedObject instanceof SeedTable) {
-
                             SeedTable rawSeedTable = (SeedTable) rawSeedObject;
                             SeedTable processSeedTable = directiveProcessor.processDirectives(rawSeedTable);
                             processedSeedTables.add(processSeedTable);

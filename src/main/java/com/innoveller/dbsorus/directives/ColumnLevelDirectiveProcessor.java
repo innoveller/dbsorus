@@ -80,7 +80,7 @@ public class ColumnLevelDirectiveProcessor {
                     case INSTANT:
                         return DateTimeExpressionParser.parseInstant(directive.getValue()).toString();
                     case JSON:
-                        return (jsonNodeMap.containsKey(columnValue.trim()))? jsonNodeMap.get(columnValue.trim()).toString() : "";
+                        return (jsonNodeMap.containsKey(directive.getValue()))? jsonNodeMap.get(directive.getValue()).toString() : "";
                     default:
                         throw new RuntimeException("Cannot process the parsed directive: " + directive.getType());
                 }
