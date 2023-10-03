@@ -29,6 +29,18 @@ public class DbSorus {
                 .orElseThrow(() -> new RuntimeException("Cannot retrieve the generated UUID by key: " + key));
     }
 
+    @Deprecated
+    public UUID getOrGenerateUUID(String key) {
+        return this.directiveProcessor.getColumnLevelDirectiveProcessor().retrieveGeneratedUUID(key)
+                .orElseThrow(() -> new RuntimeException("Cannot retrieve the generated UUID by key: " + key));
+    }
+
+    public Integer retrieveGeneratedInteger(String key) {
+        return this.directiveProcessor.getColumnLevelDirectiveProcessor().retrieveGeneratedInteger(key)
+                .orElseThrow(() -> new RuntimeException("Cannot retrieve the generated integer by key: " + key));
+    }
+
+    @Deprecated
     public Integer getorGenerateInteger(String key) {
         return this.directiveProcessor.getColumnLevelDirectiveProcessor().retrieveGeneratedInteger(key)
                 .orElseThrow(() -> new RuntimeException("Cannot retrieve the generated Integer by key: " + key));
