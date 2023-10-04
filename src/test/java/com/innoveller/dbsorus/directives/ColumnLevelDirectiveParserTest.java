@@ -32,4 +32,5 @@ public class ColumnLevelDirectiveParserTest {
         assertEquals(ColumnLevelDirective.DirectiveType.DATE, directive.getType());
         assertEquals("today", directive.getValue());
     }
+
 }

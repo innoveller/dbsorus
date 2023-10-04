@@ -22,12 +22,11 @@
 ]
 ```
 
-
 @table: town
 
-| id   | name_en | description_en     |
-|------|---------|--------------------|
-| 1200 | Yangon  | @json:selection-1  |
+| id   | name_en        | name_mm                    | description_en     | description_mm     |
+|------|----------------|----------------------------|--------------------|--------------------|
+| 1200 | Yangon @int:u1 | {"date":"@date:today+P1D"} | @json:selection-1  | {@int:u1, @int:u1} |
 
 @table: township
 

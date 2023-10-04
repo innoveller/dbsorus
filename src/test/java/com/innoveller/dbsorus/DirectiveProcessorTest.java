@@ -198,9 +198,28 @@ public class DirectiveProcessorTest {
         JsonNode processNode = directiveProcessor.processDirectives(seedJsonDocument);
         System.out.println("processed json:\n" + processNode.toString());
         assertEquals(String.valueOf(generatedInt), processNode.get(0).get("id").asText());
-
-
     }
 
 
+    @Test
+    public void shouldGenerateNumberInsideArray() throws Exception {
+        DirectiveProcessor directiveProcessor = new DirectiveProcessor();
+
+        Map<String, String> rowMap = new HashMap<>();
+        rowMap.put("id", "1");
+        rowMap.put("categories", "{@int:a, @int:b}");
+
+        SeedTableRow seedTableRow = new SeedTableRow(rowMap);
+        SeedTable seedTable = new SeedTable("products", 0,
+                Stream.of("id", "categories").collect(Collectors.toList()),
+                Collections.singletonList(seedTableRow));
+
+        SeedTable resultSeedTable = directiveProcessor.processDirectives(seedTable);
+        List<SeedTableRow> resultRows = resultSeedTable.getRows();
+        assertEquals(1, resultRows.size());
+
+        System.out.println(resultRows.get(0).getValue("categories"));
+
+        // assertEquals("10", resultRows.get(0).getValue("total_count"));
+    }
 }
