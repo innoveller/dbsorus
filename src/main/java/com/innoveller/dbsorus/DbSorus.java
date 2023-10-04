@@ -25,24 +25,24 @@ public class DbSorus {
     }
 
     public UUID retrieveGeneratedUUID(String key) {
-        return this.directiveProcessor.getColumnLevelDirectiveProcessor().retrieveGeneratedUUID(key)
+        return this.directiveProcessor.getIdGenerator().retrieveGeneratedUUID(key)
                 .orElseThrow(() -> new RuntimeException("Cannot retrieve the generated UUID by key: " + key));
     }
 
     @Deprecated
     public UUID getOrGenerateUUID(String key) {
-        return this.directiveProcessor.getColumnLevelDirectiveProcessor().retrieveGeneratedUUID(key)
+        return this.directiveProcessor.getIdGenerator().retrieveGeneratedUUID(key)
                 .orElseThrow(() -> new RuntimeException("Cannot retrieve the generated UUID by key: " + key));
     }
 
     public Integer retrieveGeneratedInteger(String key) {
-        return this.directiveProcessor.getColumnLevelDirectiveProcessor().retrieveGeneratedInteger(key)
+        return this.directiveProcessor.getIdGenerator().retrieveGeneratedInteger(key)
                 .orElseThrow(() -> new RuntimeException("Cannot retrieve the generated integer by key: " + key));
     }
 
     @Deprecated
     public Integer getorGenerateInteger(String key) {
-        return this.directiveProcessor.getColumnLevelDirectiveProcessor().retrieveGeneratedInteger(key)
+        return this.directiveProcessor.getIdGenerator().retrieveGeneratedInteger(key)
                 .orElseThrow(() -> new RuntimeException("Cannot retrieve the generated Integer by key: " + key));
     }
 
@@ -57,6 +57,8 @@ public class DbSorus {
         private String databaseUrl;
         private String username;
         private String password;
+
+        private IDGenerator idGenerator;
 
         public Configurator(ClassLoader classLoader) {
             this.classLoader = classLoader;
@@ -75,6 +77,11 @@ public class DbSorus {
             return this;
         }
 
+        public Configurator idGenerator(IDGenerator idGenerator) {
+            this.idGenerator = idGenerator;
+            return this;
+        }
+
         public Configurator seedPaths(String... paths) {
             Collections.addAll(this.seedPaths, paths);
             return this;
@@ -84,7 +91,11 @@ public class DbSorus {
             MdTableParser mdTableParser = new MdTableParser();
             MdJsonParser mdJsonParser = new MdJsonParser();
 
-            DirectiveProcessor directiveProcessor = new DirectiveProcessor();
+            if(idGenerator == null) {
+                idGenerator = new IDGenerator();
+            }
+
+            DirectiveProcessor directiveProcessor = new DirectiveProcessor(idGenerator);
 
             List<SeedTable> processedSeedTables = new ArrayList<>();
             for(String seedPath : seedPaths) {

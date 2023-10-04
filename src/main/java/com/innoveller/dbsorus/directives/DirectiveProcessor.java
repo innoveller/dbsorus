@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.TextNode;
+import com.innoveller.dbsorus.IDGenerator;
 import com.innoveller.dbsorus.directives.ColumnLevelDirectiveProcessor;
 import com.innoveller.dbsorus.expressions.SeriesExpressionParser;
 import com.innoveller.dbsorus.models.SeedJsonDocument;
@@ -16,11 +17,16 @@ import java.util.stream.Collectors;
 
 public class DirectiveProcessor {
 
-    private final ColumnLevelDirectiveProcessor columnLevelDirectiveProcessor = new ColumnLevelDirectiveProcessor();
+    private final ColumnLevelDirectiveProcessor columnLevelDirectiveProcessor;
 
     private final ObjectMapper objectMapper;
 
-    public DirectiveProcessor() {
+    private final IDGenerator idGenerator;
+
+    public DirectiveProcessor(IDGenerator idGenerator) {
+        this.idGenerator = idGenerator;
+        columnLevelDirectiveProcessor = new ColumnLevelDirectiveProcessor(idGenerator);
+
         objectMapper = new ObjectMapper();
         objectMapper.setNodeFactory(new JsonNodeFactory() {
             @Override
@@ -31,16 +37,20 @@ public class DirectiveProcessor {
         });
     }
 
+    public IDGenerator getIdGenerator() {
+        return idGenerator;
+    }
+
     public ColumnLevelDirectiveProcessor getColumnLevelDirectiveProcessor() {
         return columnLevelDirectiveProcessor;
     }
 
     public Optional<UUID> retrieveGeneratedUUID(String key) {
-        return this.getColumnLevelDirectiveProcessor().retrieveGeneratedUUID(key);
+        return this.idGenerator.retrieveGeneratedUUID(key);
     }
 
     public Optional<Integer> retrieveGeneratedInteger(String key) {
-        return this.getColumnLevelDirectiveProcessor().retrieveGeneratedInteger(key);
+        return this.idGenerator.retrieveGeneratedInteger(key);
     }
 
     public JsonNode processDirectives(SeedJsonDocument seedJsonDocument) throws IOException {

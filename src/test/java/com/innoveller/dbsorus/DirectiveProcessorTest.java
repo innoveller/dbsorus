@@ -22,7 +22,7 @@ import static org.junit.Assert.assertNull;
 public class DirectiveProcessorTest {
     @Test
     public void shouldSupportNullValues() throws Exception {
-        DirectiveProcessor directiveProcessor = new DirectiveProcessor();
+        DirectiveProcessor directiveProcessor = new DirectiveProcessor(new IDGenerator());
 
         SeedTableRow seedTableRow1 = new SeedTableRow(FluentHashMap.map("id", "1").with("name", "James"));
         SeedTableRow seedTableRow2 = new SeedTableRow(FluentHashMap.map("id", "2").with("name", null));
@@ -43,7 +43,7 @@ public class DirectiveProcessorTest {
 
     @Test
     public void shouldGenerateUUIDs() throws Exception {
-        DirectiveProcessor directiveProcessor = new DirectiveProcessor();
+        DirectiveProcessor directiveProcessor = new DirectiveProcessor(new IDGenerator());
 
         SeedTableRow seedTableRow = new SeedTableRow(Collections.singletonMap("id", "@uuid:x"));
         SeedTable seedTable = new SeedTable("users", 0, Collections.singletonList("id"), Collections.singletonList(seedTableRow));
@@ -58,7 +58,7 @@ public class DirectiveProcessorTest {
 
     @Test
     public void shouldGenerateInteger() throws Exception {
-        DirectiveProcessor directiveProcessor = new DirectiveProcessor();
+        DirectiveProcessor directiveProcessor = new DirectiveProcessor(new IDGenerator());
 
         SeedTableRow seedTableRow1 = new SeedTableRow(Collections.singletonMap("id", "@int:x"));
         SeedTableRow seedTableRow2 = new SeedTableRow(Collections.singletonMap("id", "@integer:y"));
@@ -81,7 +81,7 @@ public class DirectiveProcessorTest {
 
     @Test
     public void shouldGenerateNumberSeries() throws Exception {
-        DirectiveProcessor directiveProcessor = new DirectiveProcessor();
+        DirectiveProcessor directiveProcessor = new DirectiveProcessor(new IDGenerator());
 
         Map<String, String> rowMap = new HashMap<>();
         rowMap.put("id", "1");
@@ -104,7 +104,7 @@ public class DirectiveProcessorTest {
 
     @Test
     public void shouldGenerateDateSeries() throws Exception {
-        DirectiveProcessor directiveProcessor = new DirectiveProcessor();
+        DirectiveProcessor directiveProcessor = new DirectiveProcessor(new IDGenerator());
 
         Map<String, String> rowMap = new HashMap<>();
         rowMap.put("id", "1");
@@ -124,7 +124,7 @@ public class DirectiveProcessorTest {
 
     @Test
     public void shouldGenerateDate() throws Exception {
-        DirectiveProcessor directiveProcessor = new DirectiveProcessor();
+        DirectiveProcessor directiveProcessor = new DirectiveProcessor(new IDGenerator());
 
         SeedTableRow seedTableRow = new SeedTableRow(FluentHashMap
                 .map("room_id", "@uuid:r1")
@@ -147,7 +147,7 @@ public class DirectiveProcessorTest {
 
     @Test
     public void shouldGenerateDateTime() throws Exception {
-        DirectiveProcessor directiveProcessor = new DirectiveProcessor();
+        DirectiveProcessor directiveProcessor = new DirectiveProcessor(new IDGenerator());
 
         SeedTableRow seedTableRow = new SeedTableRow(FluentHashMap
                 .map("room_id", "@uuid:r1")
@@ -193,8 +193,8 @@ public class DirectiveProcessorTest {
         JsonNode jsonNode = objectMapper.readTree(content);
         SeedJsonDocument seedJsonDocument = new SeedJsonDocument("selection", 0, jsonNode);
 
-        DirectiveProcessor directiveProcessor = new DirectiveProcessor();
-        Integer generatedInt = directiveProcessor.getColumnLevelDirectiveProcessor().getOrGenerateInteger("rt-1");
+        DirectiveProcessor directiveProcessor = new DirectiveProcessor(new IDGenerator());
+        Integer generatedInt = directiveProcessor.getIdGenerator().getOrGenerateInteger("rt-1");
         JsonNode processNode = directiveProcessor.processDirectives(seedJsonDocument);
         System.out.println("processed json:\n" + processNode.toString());
         assertEquals(String.valueOf(generatedInt), processNode.get(0).get("id").asText());
@@ -203,7 +203,7 @@ public class DirectiveProcessorTest {
 
     @Test
     public void shouldGenerateNumberInsideArray() throws Exception {
-        DirectiveProcessor directiveProcessor = new DirectiveProcessor();
+        DirectiveProcessor directiveProcessor = new DirectiveProcessor(new IDGenerator());
 
         Map<String, String> rowMap = new HashMap<>();
         rowMap.put("id", "1");
